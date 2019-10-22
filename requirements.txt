@@ -1,2 +1,8 @@
 numpy
 scipy
+jupyter
+notebook
+pyserial
+black
+autopep8
+isort
