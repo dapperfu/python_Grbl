@@ -1,8 +1,11 @@
-numpy
-scipy
+autopep8
+black
+isort
 jupyter
 notebook
+numpy
+
+pre-commit
 pyserial
-black
-autopep8
-isort
+pyupgrade
+scipy

@@ -1,16 +1,23 @@
-import uuid
-import Grbl
 import time
+import uuid
+
 import pytest
+
+import Grbl
+
 
 def test_grbl_reset(grbl):
     grbl.reset()
 
-def test_grbl_status(grbl):
-    assert len(grbl.cmd("$$"))==36
 
-def test_grbl_status(grbl):
+def test_grbl_status1(grbl):
+    assert len(grbl.cmd("$$")) == 36
+
+
+def test_grbl_status2(grbl):
     print(f"{grbl.status}")
+
+
 """
 # Inline, one test for all the settings/parameters.
 def test_grbl_settings(grbl):
@@ -21,7 +28,7 @@ def test_grbl_gcode_parameters(grbl):
     for gcode_parameter in GRBL.gcode_parameters:
         print(f"{gcode_parameter}={getattr(grbl, gcode_parameter)}")
 """
-# Paramaterized, generate a bunch of tests        
+# Paramaterized, generate a bunch of tests
 @pytest.mark.parametrize("key, setting", Grbl.settings_key)
 def test_grbl_settings(grbl, key, setting):
     print(f"{setting} ({key}): {getattr(grbl, setting)}")
