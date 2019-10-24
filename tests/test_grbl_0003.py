@@ -1,5 +1,5 @@
 import uuid
-import GRBL
+import Grbl
 import time
 import pytest
 
@@ -22,13 +22,13 @@ def test_grbl_gcode_parameters(grbl):
         print(f"{gcode_parameter}={getattr(grbl, gcode_parameter)}")
 """
 # Paramaterized, generate a bunch of tests        
-@pytest.mark.parametrize("key, setting", GRBL.settings_key)
+@pytest.mark.parametrize("key, setting", Grbl.settings_key)
 def test_grbl_settings(grbl, key, setting):
     print(f"{setting} ({key}): {getattr(grbl, setting)}")
     time.sleep(0.1)
 
 
-@pytest.mark.parametrize("gcode_parameter", GRBL.gcode_parameters)
+@pytest.mark.parametrize("gcode_parameter", Grbl.gcode_parameters)
 def test_grbl_gcode_parameters2(grbl, gcode_parameter):
     print(f"{gcode_parameter}={getattr(grbl, gcode_parameter)}")
     time.sleep(0.1)

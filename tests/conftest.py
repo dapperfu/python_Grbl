@@ -2,7 +2,7 @@ import pytest
 
 import uuid
 
-import GRBL
+import Grbl
 
 import time
 
@@ -24,7 +24,7 @@ def function_uuid():
 
 @pytest.fixture(scope="session")
 def grbl():
-    grbl=GRBL.GRBL(port="/dev/ttyUSB0", baudrate=115200)
+    grbl=Grbl.Grbl(port="/dev/ttyUSB0", baudrate=115200)
     time.sleep(2)
     yield grbl
     if not grbl.serial.closed:

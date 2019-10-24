@@ -1,6 +1,6 @@
 """ __init__.py
 
-GRBL: Python GRBL Serial Wraper Thing.
+Grbl: Python Grbl Serial Wraper Thing.
 
 """
 
@@ -11,13 +11,13 @@ import serial
 run_states = ["Idle", "Run", "Hold", "Door", "Home", "Alarm", "Check"]
 
 
-class GRBL(object):
+class Grbl(object):
     """
-    Class for a GRBL controlled CNC.
+    Class for a Grbl controlled CNC.
 
-    Tested on GRBL v1.1f & v1.1h.
+    Tested on Grbl v1.1f & v1.1h.
 
-    Developed on various Chinese CNC 3018 / CNC 6040 running GRBL.
+    Developed on various Chinese CNC 3018 / CNC 6040 running Grbl.
     """
     def __init__(self, port: str, baudrate: int=115200):
         """
@@ -30,7 +30,7 @@ class GRBL(object):
             self.serial.close()
 
     def __repr__(self):
-        return f"GRBL<{self.serial.port}>"
+        return f"Grbl<{self.serial.port}>"
 
     def write(self, command_line: str = ""):
         bytes_written = [0, 0]
@@ -40,7 +40,7 @@ class GRBL(object):
 
     def read(self, multiline=True, timeout=-1):
         """
-        Read multiple responses from GRBL.
+        Read multiple responses from Grbl.
 
         multiline [true]: Read multiple lines.
         timeout [-1]: Specify alternative timeout.
@@ -59,7 +59,7 @@ class GRBL(object):
         return responses
 
     def cmd(self, command_line, resp=True, multiline=True):
-        """cmd: Send a command to GRBL and return its response.
+        """cmd: Send a command to Grbl and return its response.
         command_line: command to send to grbl
         resp [True]: return a response.
         multiline [True]: return a multiple line response.
@@ -79,7 +79,7 @@ class GRBL(object):
     def reset(self, home=True):
         """ https://github.com/gnea/grbl/wiki/Grbl-v1.1-Commands#grbl-v11-realtime-commands
         """
-        for t in range(GRBL.TIMEOUT):
+        for t in range(10):
             ret = self.cmd("\x18")
             if len(ret) > 0:
                 return (t, ret)
@@ -98,7 +98,7 @@ class GRBL(object):
 
     @property
     def status(self):
-        """Return the status of GRBL.
+        """Return the status of Grbl.
         """
         ret = self.cmd("?")
         if len(ret) == 1:
@@ -121,8 +121,7 @@ class GRBL(object):
         """ https://github.com/gnea/grbl/wiki/Grbl-v1.1-Commands#h---run-homing-cycle
         """
         self.write("$H")
-
-        for t in range(GRBL.TIMEOUT):
+        for t in range(Grbl.TIMEOUT):
             ret = self.cmd("")
             if len(ret) == 2:
                 assert ret[0] == "ok"
@@ -132,15 +131,15 @@ class GRBL(object):
             time.sleep(1)
         return None
 
-    # Run - Run a GRBL 'program'.
+    # Run - Run a Grbl 'program'.
 
     def run(self, program, compact=True):
-        """" run: Run a GRBL 'program'.
+        """" run: Run a Grbl 'program'.
 
         A 'program' can be:
-        - GCode Path
         - Plain text GCode file.
-        -
+        - Python GCode object.
+        - Any class with a 'buffer' property where 'buffer' is a list of GCode commands.
 
         """
         if isinstance(program, str):
@@ -178,7 +177,7 @@ class GRBL(object):
                         except BaseException:
                             # Miscounted byte counting, we're ahead.
                             pass
-            for _ in range(GRBL.TIMEOUT):
+            for _ in range(Grbl.TIMEOUT):
                 run_status = self.status.strip("<>").split("|")
                 run_state = run_status[0]
                 assert run_state in run_states
@@ -275,15 +274,15 @@ def grbl_setter_generator(cmd):
 
 # For each
 for grbl_key, human_readable in settings_key:
-    # Generate setters and getters from the GRBL
+    # Generate setters and getters from the Grbl
     setter = grbl_setter_generator(grbl_key)
     getter = grbl_getter_generator(grbl_key)
     # Generate documentation.
     doc = " ".join(human_readable.split("_"))
     # Create a property with the function setter, getter and documentation.
     fcn_prop = property(fget=getter, fset=setter, doc=doc)
-    # Add the property to GRBL class.
-    setattr(GRBL, human_readable, fcn_prop)
+    # Add the property to Grbl class.
+    setattr(Grbl, human_readable, fcn_prop)
 
 # GCode parameters:
 # https://github.com/gnea/grbl/wiki/Grbl-v1.1-Commands#---view-gcode-parameters
@@ -293,7 +292,7 @@ gcode_parameters=["G54", "G55", "G56", "G57", "G58", "G59", "G28", "G30", "G92",
 # Getter to make a function
 def gcode_param_gen(parameter):
     def gcode_param(self):
-        # Send the GRBL command to get the gcode_parameters:
+        # Send the Grbl command to get the gcode_parameters:
         gcode_parameters=self.cmd("$#")  # View gcode parameters
         # Loop through each of the returned parameters
         for gcode_parameter in gcode_parameters:
@@ -322,4 +321,4 @@ def gcode_param_gen(parameter):
 for parameter in gcode_parameters:
     fcn=gcode_param_gen(parameter)
     prop=property(fget=fcn)
-    setattr(GRBL, parameter, prop)
+    setattr(Grbl, parameter, prop)

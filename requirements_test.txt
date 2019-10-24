@@ -1,5 +1,3 @@
 pytest
-pytest-sugar
 pytest-md
-pytest-emoji
 pytest-html

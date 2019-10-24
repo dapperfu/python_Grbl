@@ -24,8 +24,8 @@ test_requirements = read_requirements(path="requirements_test.txt")
 setuptools.setup(
     version=versioneer.get_version(),
     cmdclass=versioneer.get_cmdclass(),
-    name="GRBL",
-    description="GRBL",
+    name="Grbl",
+    description="Python module to control Grbl CNC Firmware.",
     author="Jed",
     license="BSD",
     packages=setuptools.find_packages(),
