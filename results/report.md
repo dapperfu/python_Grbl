@@ -1,11 +1,12 @@
 # Test Report
 
-*Report generated on 24-Oct-2019 at 01:54:24 by [pytest-md]* 📝
+*Report generated on 24-Oct-2019 at 19:28:58 by [pytest-md]*
 
 [pytest-md]: https://github.com/hackebrot/pytest-md
 
 ## Summary
 
-47 tests ran in 2.44 seconds ⏱
+48 tests ran in 13.62 seconds
 
-- 47 😡
+- 1 failed
+- 47 passed

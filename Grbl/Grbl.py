@@ -2,7 +2,6 @@ import datetime
 import time
 import warnings
 
-import grbl
 import serial
 
 run_states = ["Idle", "Run", "Hold", "Door", "Home", "Alarm", "Check"]
