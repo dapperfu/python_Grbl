@@ -36,12 +36,12 @@ def pytest_addoption(parser):
 
 
 @pytest.fixture(scope="session")
-def grbl(request):
+def cnc(request):
     grbl_cfg = {
         "port": request.config.getoption("--port"),
         "baudrate": request.config.getoption("--baudrate"),
     }
-    grbl = Grbl.Grbl(**grbl_cfg)
+    cnc = grbl.Grbl(**grbl_cfg)
     time.sleep(2)
-    grbl.reset()
-    yield grbl
+    cnc.reset()
+    yield cnc

@@ -2,4 +2,4 @@ include versioneer.py
 include requirements_test.txt
 include requirements.txt
 include LICENSE
-include GRBL/_version.py
+include grbl/_version.py
