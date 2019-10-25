@@ -1,9 +1,8 @@
 import time
 import uuid
 
-import pytest
-
 import Grbl
+import pytest
 
 
 def test_grbl_reset(grbl):

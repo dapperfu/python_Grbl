@@ -4,11 +4,11 @@
 An entrypoint for ```grbl``` module.
 """
 import os
+import time
 
 import click
 
 from .Grbl import Grbl
-import time
 
 
 @click.group()

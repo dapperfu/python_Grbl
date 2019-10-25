@@ -13,10 +13,11 @@ def test_cli_status(cnc, request):
         "baudrate": request.config.getoption("--baudrate"),
     }
     runner = CliRunner()
-    result = runner.invoke(cli, ['status'])
+    result = runner.invoke(cli, ["status"])
     assert result.exit_code == 0
     print(grbl_cfg)
     print(result.output)
+
 
 def test_cli_print_settings(cnc, request):
     grbl_cfg = {
@@ -24,7 +25,7 @@ def test_cli_print_settings(cnc, request):
         "baudrate": request.config.getoption("--baudrate"),
     }
     runner = CliRunner()
-    result = runner.invoke(cli, ['print_settings'])
+    result = runner.invoke(cli, ["print_settings"])
     assert result.exit_code == 0
     print(grbl_cfg)
     print(result.output)
