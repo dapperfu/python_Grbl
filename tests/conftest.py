@@ -26,10 +26,22 @@ def function_uuid():
     yield uuid.uuid4()
 
 
+def pytest_addoption(parser):
+    parser.addoption(
+        "--port", action="store", default="/dev/ttyUSB0", help="grbl serial port"
+    )
+    parser.addoption(
+        "--baudrate", action="store", default="115200", help="grbl serial baudrate"
+    )
+
+
 @pytest.fixture(scope="session")
-def grbl():
-    grbl = Grbl.Grbl(port="/dev/ttyUSB0", baudrate=115200)
+def grbl(request):
+    grbl_cfg = {
+        "port": request.config.getoption("--port"),
+        "baudrate": request.config.getoption("--baudrate"),
+    }
+    grbl = Grbl.Grbl(**grbl_cfg)
     time.sleep(2)
+    grbl.reset()
     yield grbl
-    if not grbl.serial.closed:
-        grbl.serial.close()

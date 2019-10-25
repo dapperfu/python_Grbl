@@ -2,6 +2,7 @@
 from .Grbl import gcode_parameters
 from .Grbl import Grbl
 from .Grbl import settings_key
+from .Grbl import settings_key_dict
 
 # from .magics import grbl_cell_magic
 
@@ -13,6 +14,7 @@ from .Grbl import settings_key
 __all__ = [
     "Grbl",
     "settings_key",
+    "settings_key_dict",
     "gcode_parameters",
     #    "grbl_cell_magic",
     #    "load_ipython_extension",

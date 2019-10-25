@@ -2,18 +2,16 @@ import datetime
 import time
 import warnings
 
+import numpy as np
 import serial
 
 run_states = ["Idle", "Run", "Hold", "Door", "Home", "Alarm", "Check"]
 
 
 class Grbl:
-    """
-    Class for a Grbl controlled CNC.
+    """Class for a Grbl controlled CNC.
 
-    Tested on Grbl v1.1f & v1.1h.
-
-    Developed on various Chinese CNC 3018 / CNC 6040 running Grbl.
+    Tested on Grbl v1.1f, v1.1g, & v1.1h.
     """
 
     def __init__(self, port: str, baudrate: int = 115200):
@@ -21,6 +19,7 @@ class Grbl:
         port <str>
         """
         self.serial = serial.Serial(port=port, baudrate=baudrate, timeout=0.10)
+        self.cmd("$10=2")
 
     def __del__(self):
         pass
@@ -97,6 +96,10 @@ class Grbl:
         """Return the status of Grbl.
         """
         ret = self.cmd("?")
+        if len(ret) == 0:
+            time.sleep(1)
+            ret = self.cmd("?")
+
         if len(ret) == 1:
             # Held
             return ret[0]
@@ -127,27 +130,29 @@ class Grbl:
             time.sleep(1)
         return None
 
-    # Run - Run a Grbl 'program'.
-
-    def run(self, program, compact=True):
+    def run(self, program):
         """" run: Run a Grbl 'program'.
 
         A 'program' can be:
         - Plain text GCode file.
+        - GCode commands in a list.
         - Python GCode object.
         - Any class with a 'buffer' property where 'buffer' is a list of GCode commands.
 
         """
-        if isinstance(program, str):
+        if isinstance(program, list):
+            pass
+        elif isinstance(program, str):
             program = program.splitlines()
-        else:
+        elif hasattr(program, "buffer"):
             program = program.buffer
+        else:
+            raise Exception(f"Unknown Program {type(program)}\n{program}")
 
         # Strip whitespace and force letters to capital.
         program = [line.strip().upper() for line in program]
-        # Save bits.
-        if compact:
-            program = [line.replace(" ", "") for line in program]
+        # Strip out all whitespace
+        program = [line.replace(" ", "") for line in program]
 
         t1 = time.time()
         self.serial.flushInput()
@@ -161,37 +166,46 @@ class Grbl:
                 bytes_written = self.write(program_line)
                 buffer_bytes.extend(bytes_written)
                 results = self.read(multiline=True, timeout=0.1)
-
+                # While we wait on grbl to respond with an ok.
                 while len(results) == 0:
-                    time.sleep(0.5)
-                    results = self.read(multiline=True, timeout=0.1)
-
-                for result in results:
-                    if result == "ok":
-                        try:
-                            buffer_bytes.pop(0)
-                        except BaseException:
-                            # Miscounted byte counting, we're ahead.
-                            pass
-            for _ in range(10):
-                run_status = self.status.strip("<>").split("|")
-                run_state = run_status[0]
-                assert run_state in run_states
-                if run_state is "Run":
-                    print(run_state)
+                    # Wait
                     time.sleep(0.25)
-                else:
-                    break
+                    # Try again
+                    results = self.read(multiline=True, timeout=0.1)
+            time.sleep(0.5)
+            # While the command is running:
+            while "Run" in self.status():
+                print(".", end="")
+                time.sleep(0.25)
         except KeyboardInterrupt:
+            # Halt the machine on a keyboard interrupt.
             self.cmd("!")
             print("^C")
+
         return time.time() - t1
 
+    @property
     def cordinates_absolute(self):
         return "G90" in parser_state
 
+    @cordinates_absolute.setter
+    def cordinates_absolute(self, mode: bool):
+        if mode:
+            self.cmd("G90")
+        else:
+            self.cmd("G91")
+        assert self.cordinates_absolute
+
+    @property
     def coordinates_relative(self):
         return "G91" in parser_state
+
+    @coordinates_relative.setter
+    def coordinates_relative(self, mode: bool):
+        if mode:
+            self.cmd("G91")
+        else:
+            self.cmd("G90")
 
     @property
     def inch(self):
@@ -254,6 +268,17 @@ M5
 """
         )
 
+    @property
+    def probe_success(self):
+        prb_line = [line for line in self.cmd("$#") if "PRB" in line]
+        assert len(prb_line) == 1
+        _, _, success = prb_line[0].strip("[]").split(":")
+        if success == "0":
+            return False
+        elif success == "1":
+            return True
+        raise Exception(success)
+
 
 # https://github.com/gnea/grbl/wiki/Grbl-v1.1-Configuration#---view-grbl-settings
 # $$ - View Grbl settings
@@ -302,6 +327,10 @@ settings_key = [
     ("$131", "y_travel"),
     ("$132", "z_travel"),
 ]
+
+settings_key_dict = dict()
+for key, value in settings_key:
+    settings_key_dict[key] = value
 
 # Generate a getter to look for
 
@@ -363,12 +392,10 @@ gcode_parameters = [
     "G30",
     "G92",
     "TLO",
-    "PRB",
+    #    "PRB",
 ]
 
 # Getter to make a function
-
-
 def gcode_param_gen(parameter):
     def gcode_param(self):
         # Send the Grbl command to get the gcode_parameters:
@@ -381,9 +408,12 @@ def gcode_param_gen(parameter):
                 try:
                     _, value = gcode_parameter.split(":")
                 except:
-                    print(f"{gcode_parameter}")
-                    print(gcode_parameters)
-                    raise Exception(f"{gcode_parameter}")
+                    try:
+                        _, value, self.probe_success = gcode_parameter.split(":")
+                    except:
+                        print(f"{gcode_parameter}")
+                        print(gcode_parameters)
+                        raise Exception(f"{gcode_parameter}")
                 # String lineup.
                 value = value.strip("]")
                 # Split the return line

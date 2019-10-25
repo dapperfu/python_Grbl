@@ -1,12 +1,4 @@
-autopep8
-black
-docopt
-isort
-jupyter
-notebook
-numpy
-
+click
 pre-commit
 pyserial
-pyupgrade
 scipy
