@@ -1,4 +1,4 @@
 click
 pre-commit
 pyserial
-scipy
+numpy
