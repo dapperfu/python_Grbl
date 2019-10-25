@@ -39,4 +39,5 @@ setuptools.setup(
     install_requires=requirements,
     extras_require={"test": test_requirements},
     include_package_data=True,
+    entry_points={"console_scripts": ["grbl.py = Grbl.cli:cli"]},
 )

@@ -1,5 +1,6 @@
 autopep8
 black
+docopt
 isort
 jupyter
 notebook

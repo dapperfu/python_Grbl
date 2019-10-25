@@ -42,4 +42,4 @@ grbl.hex:
 
 .PHONY: watch
 watch:
-	watcher -cmd pytest -keepalive -startcmd GRBL/*.py tests/*.py
+	watcher -cmd 'pre-commit run --all-files' -keepalive
