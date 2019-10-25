@@ -122,3 +122,25 @@ def load_settings(ctx, settings_file):
 
     grbl = Grbl(**ctx.obj["GRBL_CFG"])
     print(grbl.run("\n".join(settings)))
+
+
+@cli.command("run")
+@click.argument("ngc_file")
+@click.pass_context
+def run(ctx, ngc_file):
+    """Run a gcode file on the grbl device.
+
+    Useful for loading configurations from known good files.
+
+    Example
+    -------
+
+    $ grbl_cli run --zero file.ngc
+    """
+
+    # For C&J, halloween 2019.
+    grbl = Grbl(**ctx.obj["GRBL_CFG"])
+    grbl.cmd("G92X0.0Y0.0Z0.0")
+    grbl.cmd("G21")
+    with open(ngc_file, "r") as fid:
+        grbl.run(fid.readlines())
