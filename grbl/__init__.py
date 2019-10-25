@@ -1,4 +1,5 @@
 """Grbl: Python Grbl Serial Wraper Thing."""
+from .cli import cli
 from .Grbl import gcode_parameters
 from .Grbl import Grbl
 from .Grbl import settings_key
@@ -11,11 +12,4 @@ from .Grbl import settings_key_dict
 #    ipython.register_magics(grbl_cell_magic)
 
 
-__all__ = [
-    "Grbl",
-    "settings_key",
-    "settings_key_dict",
-    "gcode_parameters",
-    #    "grbl_cell_magic",
-    #    "load_ipython_extension",
-]
+__all__ = ["Grbl", "settings_key", "settings_key_dict", "gcode_parameters", "cli"]

@@ -174,7 +174,7 @@ class Grbl:
                     results = self.read(multiline=True, timeout=0.1)
             time.sleep(0.5)
             # While the command is running:
-            while "Run" in self.status():
+            while "Run" in self.status:
                 print(".", end="")
                 time.sleep(0.25)
         except KeyboardInterrupt:

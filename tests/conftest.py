@@ -3,7 +3,7 @@ import uuid
 
 import pytest
 
-import Grbl
+import grbl
 
 
 @pytest.fixture(scope="session")

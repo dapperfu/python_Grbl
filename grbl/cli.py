@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Module for the ```grbl.py``` command line interface.
+"""Module for the ```grbl_cli``` command line interface.
 
 An entrypoint for ```grbl``` module.
 """
@@ -7,7 +7,7 @@ import os
 
 import click
 
-import Grbl
+from .Grbl import Grbl
 
 
 @click.group()
@@ -29,7 +29,7 @@ import Grbl
 def cli(ctx, port, baudrate, debug):
     """Grbl command line interface entry point.
 
-    grbl.py is a utility for interacting with Grbl from the
+    grbl_cli is a utility for interacting with Grbl from the
     command line.
     """
     # click.echo("Debug mode is %s" % ("on" if debug else "off"))
@@ -47,7 +47,7 @@ def aimlaser(ctx):
     Example
     -------
 
-    $ grbl.py aimlaser
+    $ grbl_cli aimlaser
     """
     grbl = Grbl.Grbl(**ctx.obj["GRBL_CFG"])
     grbl.aim_laser()
@@ -56,28 +56,31 @@ def aimlaser(ctx):
 @cli.command("status")
 @click.pass_context
 def status(ctx):
-    """Get Grbl status
+    """Get Grbl status.
 
     Example
     -------
 
-    $ grbl.py status
+    $ grbl_cli status
     """
     grbl = Grbl.Grbl(**ctx.obj["GRBL_CFG"])
     print(grbl.status)
 
 
-@cli.command("print_config")
+@cli.command("print_settings")
 @click.pass_context
 def print_settings(ctx):
-    """Prints the current grbl device settings
+    """Prints the current grbl device settings.
+
+    Useful for saving current grbl configuration to a file.
+    Good practice to dump a pre-built flash config so that you can re-load it if needed.
 
     Example
     -------
 
-    $ grbl.py print_settings > machine.config
+    $ grbl_cli print_settings > machine.config
     """
-    grbl = Grbl.Grbl(**ctx.obj["GRBL_CFG"])
+    grbl = Grbl(**ctx.obj["GRBL_CFG"])
     grbl.reset()
     grbl_settings = grbl.cmd("$$")
     #    assert grbl_settings[0] == "ok"
@@ -94,7 +97,14 @@ from .Grbl import settings_key_dict
 @click.argument("settings_file", type=click.File("rb"))
 @click.pass_context
 def load_settings(ctx, settings_file):
-    """Load grbl device settings from a file
+    """Load grbl device settings from a file.
+
+    Useful for loading configurations from known good files.
+
+    Example
+    -------
+
+    $ grbl_cli load_settings machine.config
     """
     print(",Loading Settings:,")
     settings = list()
