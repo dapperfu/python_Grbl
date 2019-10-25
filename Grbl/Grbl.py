@@ -23,8 +23,7 @@ class Grbl:
         self.serial = serial.Serial(port=port, baudrate=baudrate, timeout=0.10)
 
     def __del__(self):
-        while not self.serial.closed:
-            self.serial.close()
+        pass
 
     def __repr__(self):
         return f"Grbl<{self.serial.port}>"
