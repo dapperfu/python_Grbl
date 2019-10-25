@@ -8,6 +8,7 @@ import os
 import click
 
 from .Grbl import Grbl
+import time
 
 
 @click.group()
@@ -49,7 +50,7 @@ def aimlaser(ctx):
 
     $ grbl_cli aimlaser
     """
-    grbl = Grbl.Grbl(**ctx.obj["GRBL_CFG"])
+    grbl = Grbl(**ctx.obj["GRBL_CFG"])
     grbl.aim_laser()
 
 
@@ -63,7 +64,10 @@ def status(ctx):
 
     $ grbl_cli status
     """
-    grbl = Grbl.Grbl(**ctx.obj["GRBL_CFG"])
+    grbl = Grbl(**ctx.obj["GRBL_CFG"])
+    grbl.reset()
+    time.sleep(0.1)
+    grbl.status
     print(grbl.status)
 
 
@@ -116,5 +120,5 @@ def load_settings(ctx, settings_file):
         key, value = setting.split("=")
         print(f"{key},{settings_key_dict[key]},{value}")
 
-    grbl = Grbl.Grbl(**ctx.obj["GRBL_CFG"])
+    grbl = Grbl(**ctx.obj["GRBL_CFG"])
     print(grbl.run("\n".join(settings)))
