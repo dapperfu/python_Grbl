@@ -71,18 +71,15 @@ class Grbl:
         # Otherwise none.
         return None
 
-    def reset(self, home=True):
+    def reset(self, attempts=40):
         """ https://github.com/gnea/grbl/wiki/Grbl-v1.1-Commands#grbl-v11-realtime-commands
         """
-        for t in range(10):
+        for t in range(attempts):
             ret = self.cmd("\x18")
             if len(ret) > 0:
                 return (t, ret)
                 break
-            time.sleep(1)
-        if home:
-            time.sleep(1)
-            return self.home()
+            time.sleep(0.25)
         return None
 
     def sleep(self):
@@ -96,19 +93,15 @@ class Grbl:
         """Return the status of Grbl.
         """
         ret = self.cmd("?")
-        if len(ret) == 0:
-            time.sleep(1)
+        while len(ret) == 0:
+            time.sleep(0.25)
             ret = self.cmd("?")
 
-        if len(ret) == 1:
-            # Held
-            return ret[0]
-        elif len(ret) == 3:
-            return ret[1]
-        else:
-            raise (Exception(ret))
-
-        assert ret[-1] == "ok"
+        for r in ret:
+            if r == "ok":
+                continue
+            return r
+        return None
 
     def kill_alarm(self):
         """ https://github.com/gnea/grbl/wiki/Grbl-v1.1-Commands#x---kill-alarm-lock
