@@ -17,13 +17,13 @@ from .Grbl import Grbl
     "--port",
     metavar="port",
     default="/dev/ttyUSB0",
-    help="Weight file. [Default: {}]".format("/dev/ttyUSB0"),
+    help="Grbl port. [Default: {}]".format("/dev/ttyUSB0"),
 )
 @click.option(
     "--baudrate",
     metavar="baudrate",
     default=115200,
-    help="Weight file. [Default: 115200]",
+    help="Grbl baud rate . [Default: 115200]",
 )
 @click.option("--debug/--no-debug", default=False)
 @click.pass_context
@@ -136,6 +136,8 @@ def run(ctx, ngc_file):
     -------
 
     $ grbl_cli run --zero file.ngc
+
+    $ grbl_cli run --home file.ngc
     """
 
     # For C&J, halloween 2019.
