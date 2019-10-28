@@ -1,4 +1,4 @@
 click
 numpy
-pre-commit
 pyserial
+tqdm

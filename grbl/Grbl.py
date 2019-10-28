@@ -4,6 +4,7 @@ import warnings
 
 import numpy as np
 import serial
+from tqdm import tqdm
 
 run_states = ["Idle", "Run", "Hold", "Door", "Home", "Alarm", "Check"]
 
@@ -160,7 +161,7 @@ class Grbl:
 
         try:
             # For each line in the program"
-            for program_line in program:
+            for program_line in tqdm(program):
                 bytes_written = self.write(program_line)
                 buffer_bytes.extend(bytes_written)
                 results = self.read(multiline=True, timeout=0.1)
