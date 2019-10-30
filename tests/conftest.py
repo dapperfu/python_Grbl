@@ -33,9 +33,7 @@ def pytest_addoption(parser):
     parser.addoption(
         "--baudrate", action="store", default="115200", help="grbl serial baudrate"
     )
-    parser.addoption(
-        "--ngc", action="store", default=None, help="file to run."
-    )
+    parser.addoption("--ngc", action="store", default=None, help="file to run.")
 
 
 @pytest.fixture(scope="session")

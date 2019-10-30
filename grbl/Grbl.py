@@ -4,6 +4,7 @@ import warnings
 
 import numpy as np
 import serial
+from progress.spinner import PixelSpinner
 from tqdm import tqdm
 
 run_states = ["Idle", "Run", "Hold", "Door", "Home", "Alarm", "Check"]
@@ -21,8 +22,8 @@ class Grbl:
         """
         self.serial = serial.Serial()
         self.serial.port = port
-        self.serial.baudrate=baudrate
-        self.serial.timeout=0.10
+        self.serial.baudrate = baudrate
+        self.serial.timeout = 0.10
         self.serial.setDTR(False)
         self.serial.open()
         self.cmd("$10=2")
@@ -161,21 +162,24 @@ class Grbl:
 
         try:
             # For each line in the program"
-            for program_line in tqdm(program):
-                bytes_written = self.write(program_line)
-                buffer_bytes.extend(bytes_written)
-                results = self.read(multiline=True, timeout=0.1)
-                # While we wait on grbl to respond with an ok.
-                while len(results) == 0:
-                    # Wait
-                    time.sleep(0.25)
-                    # Try again
+            with PixelSpinner("Sending...") as bar:
+                for program_line in tqdm(program):
+                    bar.next()
+                    bytes_written = self.write(program_line)
+                    buffer_bytes.extend(bytes_written)
                     results = self.read(multiline=True, timeout=0.1)
+                    # While we wait on grbl to respond with an ok.
+                    while len(results) == 0:
+                        # Wait
+                        time.sleep(0.25)
+                        # Try again
+                        results = self.read(multiline=True, timeout=0.1)
             time.sleep(0.5)
             # While the command is running:
-            while "Run" in self.status:
-                print(".", end="")
-                time.sleep(0.25)
+            with PixelSpinner("Running...") as bar:
+                while "Run" in self.status:
+                    time.sleep(0.1)
+                    bar.next()
         except KeyboardInterrupt:
             # Halt the machine on a keyboard interrupt.
             self.cmd("!")
