@@ -1,4 +1,5 @@
 import datetime
+import termios
 import time
 import warnings
 
@@ -20,11 +21,16 @@ class Grbl:
         """
         port <str>
         """
+
+        # Disable reset after hangup
+        with open(port) as f:
+            attrs = termios.tcgetattr(f)
+            attrs[2] = attrs[2] & ~termios.HUPCL
+            termios.tcsetattr(f, termios.TCSAFLUSH, attrs)
         self.serial = serial.Serial()
         self.serial.port = port
         self.serial.baudrate = baudrate
         self.serial.timeout = 0.10
-        self.serial.setDTR(False)
         self.serial.open()
         self.cmd("$10=2")
 
