@@ -32,7 +32,6 @@ class Grbl:
         self.serial.baudrate = baudrate
         self.serial.timeout = 0.10
         self.serial.open()
-        self.cmd("$10=2")
 
     def __del__(self):
         pass
@@ -46,7 +45,7 @@ class Grbl:
         bytes_written[1] = self.serial.write(f"{command_line}\n".encode())
         return bytes_written
 
-    def read(self, multiline=True, timeout=-1):
+    def read(self, multiline: bool=True, timeout: =-1):
         """
         Read multiple responses from Grbl.
 
@@ -66,7 +65,7 @@ class Grbl:
             self.serial.timeout = old_timeout
         return responses
 
-    def cmd(self, command_line, resp=True, multiline=True):
+    def cmd(self, command_line, resp:bool=True, multiline:bool=True):
         """cmd: Send a command to Grbl and return its response.
         command_line: command to send to grbl
         resp [True]: return a response.
