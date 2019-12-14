@@ -45,7 +45,7 @@ class Grbl:
         bytes_written[1] = self.serial.write(f"{command_line}\n".encode())
         return bytes_written
 
-    def read(self, multiline: bool=True, timeout: =-1):
+    def read(self, multiline: bool=True, timeout:float =-1):
         """
         Read multiple responses from Grbl.
 
@@ -105,7 +105,11 @@ class Grbl:
         """Return the status of Grbl.
         """
         ret = self.cmd("?")
+        t1 = time.time()
         while len(ret) == 0:
+            if time.time()-t1>5:
+                warnings.warn("GRBL not responding.")
+                break
             time.sleep(0.25)
             ret = self.cmd("?")
 
