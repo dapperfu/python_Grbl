@@ -99,6 +99,17 @@ class Grbl:
         """
         ret = self.cmd("$SLP")
         assert ret[-1] == "ok"
+        
+    def __enter__(self):
+        return self
+        
+    def __exit__(self, type, value, tb):
+        t1 = time.time()
+        while self.serial.isOpen():
+            if time.time() > t1 + 5:
+                break
+            self.serial.close()
+            time.sleep(0.2)
 
     @property
     def status(self):
