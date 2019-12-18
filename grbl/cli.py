@@ -52,7 +52,13 @@ def aimlaser(ctx):
 
     $ grblcli aimlaser
     """
+    
     grbl = Grbl(**ctx.obj["GRBL_CFG"])
+    grbl.reset()
+    grbl.cmd("$X")
+    if ctx.obj["HOME"]:
+        if grbl.hard_limits==1:
+            grbl.home()        
     grbl.aim_laser()
 
 
