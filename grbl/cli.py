@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Module for the ```grbl_cli``` command line interface.
+"""Module for the ```grblcli``` command line interface.
 
 An entrypoint for ```grbl``` module.
 """
@@ -26,17 +26,19 @@ from .Grbl import Grbl
     help="Grbl baud rate . [Default: 115200]",
 )
 @click.option("--debug/--no-debug", default=False)
+@click.option("--home/--no-home", default=False, help="Perform a $H homing if $22=1")
 @click.pass_context
-def cli(ctx, port, baudrate, debug):
+def cli(ctx, port, baudrate, debug, home):
     """Grbl command line interface entry point.
 
-    grbl_cli is a utility for interacting with Grbl from the
+    grblcli is a utility for interacting with Grbl from the
     command line.
     """
     # click.echo("Debug mode is %s" % ("on" if debug else "off"))
     ctx.obj = dict()
     ctx.obj["DEBUG"] = debug
     ctx.obj["GRBL_CFG"] = {"port": port, "baudrate": baudrate}
+    ctx.obj["HOME"] = home
 
 
 @cli.command("aimlaser")
@@ -48,7 +50,7 @@ def aimlaser(ctx):
     Example
     -------
 
-    $ grbl_cli aimlaser
+    $ grblcli aimlaser
     """
     grbl = Grbl(**ctx.obj["GRBL_CFG"])
     grbl.aim_laser()
@@ -62,7 +64,7 @@ def status(ctx):
     Example
     -------
 
-    $ grbl_cli status
+    $ grblcli status
     """
     grbl = Grbl(**ctx.obj["GRBL_CFG"])
     grbl.reset()
@@ -82,7 +84,7 @@ def print_settings(ctx):
     Example
     -------
 
-    $ grbl_cli print_settings > machine.config
+    $ grblcli print_settings > machine.config
     """
     grbl = Grbl(**ctx.obj["GRBL_CFG"])
     grbl.reset()
@@ -108,7 +110,7 @@ def load_settings(ctx, settings_file):
     Example
     -------
 
-    $ grbl_cli load_settings machine.config
+    $ grblcli load_settings machine.config
     """
     print(",Loading Settings:,")
     settings = list()
@@ -130,18 +132,22 @@ def load_settings(ctx, settings_file):
 def run(ctx, ngc_file):
     """Run a gcode file on the grbl device.
 
-    Useful for loading configurations from known good files.
-
     Example
     -------
 
-    $ grbl_cli run --zero file.ngc
+    $ grblcli run --zero file.ngc
 
-    $ grbl_cli run --home file.ngc
+    $ grblcli run --home file.ngc
     """
-
+    # For S,C,&J, Christmas 2019
     # For C&J, halloween 2019.
     grbl = Grbl(**ctx.obj["GRBL_CFG"])
+    grbl.reset()
+    grbl.cmd("$X")
+    if ctx.obj["HOME"]:
+        if grbl.hard_limits==1:
+            grbl.home()        
+    
     grbl.cmd("G92X0.0Y0.0Z0.0")
     grbl.cmd("G21")
     with open(ngc_file, "r") as fid:
