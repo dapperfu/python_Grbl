@@ -38,10 +38,15 @@ def cli(ctx, port, baudrate, debug):
     ctx.obj["DEBUG"] = debug
     ctx.obj["GRBL_CFG"] = {"port": port, "baudrate": baudrate}
 
-
 @cli.command("aimlaser")
 @click.pass_context
-def aimlaser(ctx):
+@click.option(
+    "--laser_power",
+    metavar="laser_power",
+    default=1,
+    help="Laser Power Setting",
+)
+def aimlaser(ctx, laser_power):
     """Aim the laser.
 
     Turns the laser on to the minimal power setting for aiming.
@@ -49,9 +54,10 @@ def aimlaser(ctx):
     -------
 
     $ grbl_cli aimlaser
+    $ grbl_cli aim
     """
     grbl = Grbl(**ctx.obj["GRBL_CFG"])
-    grbl.aim_laser()
+    grbl.aim_laser(laser_power =  int(laser_power))
 
 
 @cli.command("status")

@@ -43,3 +43,7 @@ grbl.hex:
 .PHONY: watch
 watch:
 	watcher -cmd 'pre-commit run --all-files' -keepalive
+
+.PHONY: flash
+flash:
+	avrdude -v -V -patmega328p -carduino -P /dev/ttyUSB0 -D -U flash:w:grbl_v1.1h.20190825.hex

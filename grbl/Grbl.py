@@ -276,11 +276,12 @@ class Grbl:
 
         laser_power [int:1]: laser power to use. [0, 255]
         """
+        print(laser_power)
         input("Press Enter to start aiming laser.")
         self.run(
-            """
+            f"""
 G0
-M3S1
+M3S{laser_power}
 G1F1
 """
         )
